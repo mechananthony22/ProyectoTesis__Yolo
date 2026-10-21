@@ -12,7 +12,7 @@ Rama de trabajo: `feat/hasslab-implementacion`.
 5. No inventar precisión, recall, mAP, tiempos ni resultados de la tesis.
 6. El usuario ya tiene dataset; el sistema lo importa y administra. Vue 3 + TypeScript + Tailwind CSS. Backend Django REST Framework y PostgreSQL. Docker al final.
 
-## Checkpoint 01: implementación inicial en revisión
+## Checkpoint 02: base y autenticación verificadas en entorno aislado
 
 Se ha escrito un primer corte transversal del sistema. Está **en desarrollo**, no validado integralmente. Se conserva en Git para poder continuar sin perder trabajo. `main` conserva la planificación aprobada; la implementación se revisa en esta rama.
 
@@ -47,14 +47,14 @@ Se ha escrito un primer corte transversal del sistema. Está **en desarrollo**, 
 - `python backend/manage.py check --settings=config.test_settings`: sin errores.
 - Generadas migraciones iniciales para usuario personalizado y dominio de investigación.
 - Dependencias frontend instaladas y `package-lock.json` generado.
-- Build frontend lanzado, resultado pendiente de recuperar/repetir. No asumir que pasó.
+- Build frontend completado: TypeScript y Vite correctos (1687 módulos).
 - No se ha probado PostgreSQL, Redis, Celery ni YOLO real todavía.
 
 ## Próximo paso exacto
 
-1. Ejecutar `cd frontend && npm run build` y corregir errores TypeScript.
+1. Base frontend compilada; 4 pruebas de autenticación aprobadas. Consultar `docs/fases/02-base.md`.
 2. Añadir pruebas críticas del backend: permisos entre usuarios, ZIP seguro, anotaciones, revisiones, snapshots, división por fruto, tareas y exportaciones.
-3. Completar exportación `GET /api/v1/evaluations/{id}/export/`, que la interfaz ya invoca.
+3. Exportación de evaluación implementada; falta comprobar su contenido y permisos.
 4. Validar entorno PostgreSQL y migraciones; SQLite se usa solo en pruebas aisladas.
 5. Revisar OpenAPI, errores HTTP, dependencias AI (OpenCV headless/Ultralytics) y pruebas visuales del frontend.
 6. Cerrar fase 02 con evidencia, continuar cierres de fases 03–10 y documentar límites reales.
@@ -66,3 +66,7 @@ Se ha escrito un primer corte transversal del sistema. Está **en desarrollo**, 
 - Tokens JWT en memoria: recargar la página obliga a iniciar sesión; documentado en Configuración.
 - La observación manual presenta muestras sin referencia/predicción, pero el dueño del dataset puede consultar sus anotaciones en otro módulo. El cegamiento experimental requiere organización de participantes y protocolo.
 - Las pruebas de latencia y de GPU deben realizarse en el equipo objetivo.
+
+### Registro de checkpoints
+- `ea31137`: código inicial de todos los módulos, pendiente de validación.
+- Checkpoint 02: pruebas de autenticación, build corregido, CI PostgreSQL preparado y registro de fase 02.

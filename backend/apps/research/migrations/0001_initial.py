@@ -8,7 +8,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -17,317 +16,690 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='AIModel',
+            name="AIModel",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=160)),
-                ('weights', models.FileField(upload_to='models')),
-                ('sha256', models.CharField(max_length=64)),
-                ('active', models.BooleanField(default=False)),
-                ('approved_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=160)),
+                ("weights", models.FileField(upload_to="models")),
+                ("sha256", models.CharField(max_length=64)),
+                ("active", models.BooleanField(default=False)),
+                (
+                    "approved_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'abstract': False,
+                "ordering": ["-created_at"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='AuditEvent',
+            name="AuditEvent",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('action', models.CharField(max_length=80)),
-                ('object_id', models.CharField(max_length=100)),
-                ('detail', models.JSONField(default=dict)),
-                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("action", models.CharField(max_length=80)),
+                ("object_id", models.CharField(max_length=100)),
+                ("detail", models.JSONField(default=dict)),
+                (
+                    "actor",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'abstract': False,
+                "ordering": ["-created_at"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Dataset',
+            name="Dataset",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=160)),
-                ('description', models.TextField(blank=True)),
-                ('source', models.CharField(blank=True, max_length=500)),
-                ('license', models.CharField(blank=True, max_length=200)),
-                ('archived', models.BooleanField(default=False)),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=160)),
+                ("description", models.TextField(blank=True)),
+                ("source", models.CharField(blank=True, max_length=500)),
+                ("license", models.CharField(blank=True, max_length=200)),
+                ("archived", models.BooleanField(default=False)),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'abstract': False,
+                "ordering": ["-created_at"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='DatasetVersion',
+            name="DatasetVersion",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('number', models.PositiveIntegerField()),
-                ('seed', models.PositiveIntegerField(default=42)),
-                ('manifest', models.JSONField(default=list)),
-                ('manifest_hash', models.CharField(max_length=64)),
-                ('archive', models.FileField(upload_to='versions')),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('dataset', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='versions', to='research.dataset')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("number", models.PositiveIntegerField()),
+                ("seed", models.PositiveIntegerField(default=42)),
+                ("manifest", models.JSONField(default=list)),
+                ("manifest_hash", models.CharField(max_length=64)),
+                ("archive", models.FileField(upload_to="versions")),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "dataset",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="versions",
+                        to="research.dataset",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'abstract': False,
+                "ordering": ["-created_at"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Evaluation',
+            name="Evaluation",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=160)),
-                ('protocol', models.TextField()),
-                ('confidence', models.FloatField(default=0.25, validators=[django.core.validators.MinValueValidator(0.01), django.core.validators.MaxValueValidator(0.99)])),
-                ('locked', models.BooleanField(default=False)),
-                ('metrics', models.JSONField(default=dict)),
-                ('model', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='research.aimodel')),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('version', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='research.datasetversion')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=160)),
+                ("protocol", models.TextField()),
+                (
+                    "confidence",
+                    models.FloatField(
+                        default=0.25,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.01),
+                            django.core.validators.MaxValueValidator(0.99),
+                        ],
+                    ),
+                ),
+                ("locked", models.BooleanField(default=False)),
+                ("metrics", models.JSONField(default=dict)),
+                (
+                    "model",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="research.aimodel",
+                    ),
+                ),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "version",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="research.datasetversion",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'abstract': False,
+                "ordering": ["-created_at"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='EvaluationSample',
+            name="EvaluationSample",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('image_id_snapshot', models.CharField(max_length=36)),
-                ('fruit_code', models.CharField(max_length=120)),
-                ('truth', models.BooleanField()),
-                ('system_positive', models.BooleanField(null=True)),
-                ('system_ms', models.FloatField(null=True)),
-                ('evaluation', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='samples', to='research.evaluation')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("image_id_snapshot", models.CharField(max_length=36)),
+                ("fruit_code", models.CharField(max_length=120)),
+                ("truth", models.BooleanField()),
+                ("system_positive", models.BooleanField(null=True)),
+                ("system_ms", models.FloatField(null=True)),
+                (
+                    "evaluation",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="samples",
+                        to="research.evaluation",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'abstract': False,
+                "ordering": ["-created_at"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='ImageAsset',
+            name="ImageAsset",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('file', models.FileField(upload_to='originals/%Y/%m')),
-                ('name', models.CharField(max_length=240)),
-                ('sha256', models.CharField(db_index=True, max_length=64)),
-                ('perceptual_hash', models.CharField(max_length=16)),
-                ('width', models.PositiveIntegerField()),
-                ('height', models.PositiveIntegerField()),
-                ('size', models.PositiveIntegerField()),
-                ('source', models.CharField(blank=True, max_length=500)),
-                ('fruit_code', models.CharField(blank=True, help_text='Mismo código para fotos del mismo fruto o grupo relacionado.', max_length=120)),
-                ('split', models.CharField(blank=True, choices=[('', 'Sin asignar'), ('train', 'Train'), ('val', 'Validación'), ('test', 'Prueba')], max_length=10)),
-                ('state', models.CharField(choices=[('pending', 'Pendiente'), ('healthy', 'Sin lesiones anotadas'), ('lesion', 'Con roña'), ('discarded', 'Descartada')], default='pending', max_length=12)),
-                ('annotations', models.JSONField(default=list)),
-                ('revision', models.PositiveIntegerField(default=0)),
-                ('reviewed_at', models.DateTimeField(blank=True, null=True)),
-                ('quality', models.JSONField(default=dict)),
-                ('dataset', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='images', to='research.dataset')),
-                ('reviewed_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("file", models.FileField(upload_to="originals/%Y/%m")),
+                ("name", models.CharField(max_length=240)),
+                ("sha256", models.CharField(db_index=True, max_length=64)),
+                ("perceptual_hash", models.CharField(max_length=16)),
+                ("width", models.PositiveIntegerField()),
+                ("height", models.PositiveIntegerField()),
+                ("size", models.PositiveIntegerField()),
+                ("source", models.CharField(blank=True, max_length=500)),
+                (
+                    "fruit_code",
+                    models.CharField(
+                        blank=True,
+                        help_text="Mismo código para fotos del mismo fruto o grupo relacionado.",
+                        max_length=120,
+                    ),
+                ),
+                (
+                    "split",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("", "Sin asignar"),
+                            ("train", "Train"),
+                            ("val", "Validación"),
+                            ("test", "Prueba"),
+                        ],
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "state",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pendiente"),
+                            ("healthy", "Sin lesiones anotadas"),
+                            ("lesion", "Con roña"),
+                            ("discarded", "Descartada"),
+                        ],
+                        default="pending",
+                        max_length=12,
+                    ),
+                ),
+                ("annotations", models.JSONField(default=list)),
+                ("revision", models.PositiveIntegerField(default=0)),
+                ("reviewed_at", models.DateTimeField(blank=True, null=True)),
+                ("quality", models.JSONField(default=dict)),
+                (
+                    "dataset",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="images",
+                        to="research.dataset",
+                    ),
+                ),
+                (
+                    "reviewed_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'abstract': False,
+                "ordering": ["-created_at"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='AnnotationHistory',
+            name="AnnotationHistory",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('revision', models.PositiveIntegerField()),
-                ('annotations', models.JSONField(default=list)),
-                ('state', models.CharField(max_length=12)),
-                ('note', models.TextField(blank=True)),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('image', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='history', to='research.imageasset')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("revision", models.PositiveIntegerField()),
+                ("annotations", models.JSONField(default=list)),
+                ("state", models.CharField(max_length=12)),
+                ("note", models.TextField(blank=True)),
+                (
+                    "author",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "image",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="history",
+                        to="research.imageasset",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'abstract': False,
+                "ordering": ["-created_at"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Inspection',
+            name="Inspection",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('original', models.FileField(upload_to='inspections')),
-                ('annotated', models.FileField(blank=True, upload_to='results')),
-                ('name', models.CharField(max_length=240)),
-                ('sha256', models.CharField(max_length=64)),
-                ('detections', models.JSONField(default=list)),
-                ('inference_ms', models.FloatField(null=True, validators=[django.core.validators.MinValueValidator(0)])),
-                ('total_ms', models.FloatField(null=True, validators=[django.core.validators.MinValueValidator(0)])),
-                ('review', models.CharField(choices=[('pending', 'Pendiente'), ('confirmed', 'Confirmada'), ('corrected', 'Corregida')], default='pending', max_length=20)),
-                ('model', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='research.aimodel')),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("original", models.FileField(upload_to="inspections")),
+                ("annotated", models.FileField(blank=True, upload_to="results")),
+                ("name", models.CharField(max_length=240)),
+                ("sha256", models.CharField(max_length=64)),
+                ("detections", models.JSONField(default=list)),
+                (
+                    "inference_ms",
+                    models.FloatField(
+                        null=True,
+                        validators=[django.core.validators.MinValueValidator(0)],
+                    ),
+                ),
+                (
+                    "total_ms",
+                    models.FloatField(
+                        null=True,
+                        validators=[django.core.validators.MinValueValidator(0)],
+                    ),
+                ),
+                (
+                    "review",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pendiente"),
+                            ("confirmed", "Confirmada"),
+                            ("corrected", "Corregida"),
+                        ],
+                        default="pending",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "model",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="research.aimodel",
+                    ),
+                ),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'abstract': False,
+                "ordering": ["-created_at"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='InspectionReview',
+            name="InspectionReview",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('decision', models.CharField(max_length=20)),
-                ('note', models.TextField()),
-                ('annotations', models.JSONField(default=list)),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('inspection', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='reviews', to='research.inspection')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("decision", models.CharField(max_length=20)),
+                ("note", models.TextField()),
+                ("annotations", models.JSONField(default=list)),
+                (
+                    "author",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "inspection",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="reviews",
+                        to="research.inspection",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'abstract': False,
+                "ordering": ["-created_at"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Job',
+            name="Job",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('kind', models.CharField(max_length=20)),
-                ('state', models.CharField(choices=[('queued', 'En cola'), ('running', 'En proceso'), ('succeeded', 'Completado'), ('failed', 'Fallido')], default='queued', max_length=20)),
-                ('progress', models.PositiveIntegerField(default=0)),
-                ('config', models.JSONField(default=dict)),
-                ('result', models.JSONField(default=dict)),
-                ('error', models.TextField(blank=True)),
-                ('started_at', models.DateTimeField(blank=True, null=True)),
-                ('finished_at', models.DateTimeField(blank=True, null=True)),
-                ('task_id', models.CharField(blank=True, max_length=100)),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("kind", models.CharField(max_length=20)),
+                (
+                    "state",
+                    models.CharField(
+                        choices=[
+                            ("queued", "En cola"),
+                            ("running", "En proceso"),
+                            ("succeeded", "Completado"),
+                            ("failed", "Fallido"),
+                        ],
+                        default="queued",
+                        max_length=20,
+                    ),
+                ),
+                ("progress", models.PositiveIntegerField(default=0)),
+                ("config", models.JSONField(default=dict)),
+                ("result", models.JSONField(default=dict)),
+                ("error", models.TextField(blank=True)),
+                ("started_at", models.DateTimeField(blank=True, null=True)),
+                ("finished_at", models.DateTimeField(blank=True, null=True)),
+                ("task_id", models.CharField(blank=True, max_length=100)),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'abstract': False,
+                "ordering": ["-created_at"],
+                "abstract": False,
             },
         ),
         migrations.AddField(
-            model_name='inspection',
-            name='job',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to='research.job'),
+            model_name="inspection",
+            name="job",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.PROTECT, to="research.job"
+            ),
         ),
         migrations.CreateModel(
-            name='ImageVariant',
+            name="ImageVariant",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('file', models.FileField(upload_to='variants')),
-                ('recipe', models.JSONField(default=dict)),
-                ('annotations', models.JSONField(default=list)),
-                ('width', models.PositiveIntegerField()),
-                ('height', models.PositiveIntegerField()),
-                ('sha256', models.CharField(max_length=64)),
-                ('image', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='variants', to='research.imageasset')),
-                ('job', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='research.job')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("file", models.FileField(upload_to="variants")),
+                ("recipe", models.JSONField(default=dict)),
+                ("annotations", models.JSONField(default=list)),
+                ("width", models.PositiveIntegerField()),
+                ("height", models.PositiveIntegerField()),
+                ("sha256", models.CharField(max_length=64)),
+                (
+                    "image",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="variants",
+                        to="research.imageasset",
+                    ),
+                ),
+                (
+                    "job",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="research.job"
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'abstract': False,
+                "ordering": ["-created_at"],
+                "abstract": False,
             },
         ),
         migrations.AddField(
-            model_name='evaluation',
-            name='job',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='research.job'),
+            model_name="evaluation",
+            name="job",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="research.job",
+            ),
         ),
         migrations.CreateModel(
-            name='ManualObservation',
+            name="ManualObservation",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('participant', models.CharField(max_length=80)),
-                ('positive', models.BooleanField()),
-                ('elapsed_ms', models.FloatField(validators=[django.core.validators.MinValueValidator(1)])),
-                ('observer', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('sample', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='observations', to='research.evaluationsample')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("participant", models.CharField(max_length=80)),
+                ("positive", models.BooleanField()),
+                (
+                    "elapsed_ms",
+                    models.FloatField(
+                        validators=[django.core.validators.MinValueValidator(1)]
+                    ),
+                ),
+                (
+                    "observer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "sample",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="observations",
+                        to="research.evaluationsample",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'abstract': False,
+                "ordering": ["-created_at"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='TrainingRun',
+            name="TrainingRun",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('architecture', models.CharField(default='yolov8n.pt', max_length=30)),
-                ('metrics', models.JSONField(default=dict)),
-                ('epochs_log', models.JSONField(default=list)),
-                ('environment', models.JSONField(default=dict)),
-                ('job', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to='research.job')),
-                ('version', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='runs', to='research.datasetversion')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("architecture", models.CharField(default="yolov8n.pt", max_length=30)),
+                ("metrics", models.JSONField(default=dict)),
+                ("epochs_log", models.JSONField(default=list)),
+                ("environment", models.JSONField(default=dict)),
+                (
+                    "job",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.PROTECT, to="research.job"
+                    ),
+                ),
+                (
+                    "version",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="runs",
+                        to="research.datasetversion",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'abstract': False,
+                "ordering": ["-created_at"],
+                "abstract": False,
             },
         ),
         migrations.AddField(
-            model_name='aimodel',
-            name='run',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='models', to='research.trainingrun'),
+            model_name="aimodel",
+            name="run",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="models",
+                to="research.trainingrun",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='datasetversion',
-            constraint=models.UniqueConstraint(fields=('dataset', 'number'), name='unique_dataset_version'),
+            model_name="datasetversion",
+            constraint=models.UniqueConstraint(
+                fields=("dataset", "number"), name="unique_dataset_version"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='evaluationsample',
-            constraint=models.UniqueConstraint(fields=('evaluation', 'image_id_snapshot'), name='unique_evaluation_sample'),
+            model_name="evaluationsample",
+            constraint=models.UniqueConstraint(
+                fields=("evaluation", "image_id_snapshot"),
+                name="unique_evaluation_sample",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='imageasset',
-            constraint=models.UniqueConstraint(fields=('dataset', 'sha256'), name='unique_image_in_dataset'),
+            model_name="imageasset",
+            constraint=models.UniqueConstraint(
+                fields=("dataset", "sha256"), name="unique_image_in_dataset"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='annotationhistory',
-            constraint=models.UniqueConstraint(fields=('image', 'revision'), name='unique_annotation_revision'),
+            model_name="annotationhistory",
+            constraint=models.UniqueConstraint(
+                fields=("image", "revision"), name="unique_annotation_revision"
+            ),
         ),
         migrations.AddIndex(
-            model_name='job',
-            index=models.Index(fields=['owner', 'state', 'created_at'], name='research_jo_owner_i_e184ae_idx'),
+            model_name="job",
+            index=models.Index(
+                fields=["owner", "state", "created_at"],
+                name="research_jo_owner_i_e184ae_idx",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='manualobservation',
-            constraint=models.UniqueConstraint(fields=('sample', 'participant'), name='one_manual_observation'),
+            model_name="manualobservation",
+            constraint=models.UniqueConstraint(
+                fields=("sample", "participant"), name="one_manual_observation"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='aimodel',
-            constraint=models.UniqueConstraint(condition=models.Q(('active', True)), fields=('active',), name='one_active_model'),
+            model_name="aimodel",
+            constraint=models.UniqueConstraint(
+                condition=models.Q(("active", True)),
+                fields=("active",),
+                name="one_active_model",
+            ),
         ),
     ]
