@@ -1,0 +1,2 @@
+<script setup lang="ts">import {labels} from '../services/api';defineProps<{value:string}>()</script>
+<template><span class="badge" :class="{'!bg-emerald-50 !text-emerald-700':['succeeded','healthy','confirmed'].includes(value),'!bg-amber-50 !text-amber-700':['pending','queued','running'].includes(value),'!bg-red-50 !text-red-700':['failed','lesion'].includes(value)}"><span class="h-1.5 w-1.5 rounded-full bg-current"></span>{{labels[value]||value}}</span></template>

@@ -1,0 +1,2 @@
+<script setup lang="ts">import {Sprout} from 'lucide-vue-next';defineProps<{title:string;text:string}>()</script>
+<template><div class="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-14 text-center"><Sprout class="mx-auto mb-4 h-10 w-10 text-emerald-500"/><h3 class="font-semibold text-forest">{{title}}</h3><p class="mx-auto mt-2 max-w-md text-sm text-slate-500">{{text}}</p><div class="mt-5"><slot/></div></div></template>

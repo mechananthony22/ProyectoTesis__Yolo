@@ -1,0 +1,23 @@
+<script setup lang="ts">
+import {ref,onMounted,onBeforeUnmount} from 'vue';import {useRoute,useRouter} from 'vue-router';import {useAuth} from './stores/auth'
+import {Sprout,LayoutDashboard,Database,ScanLine,SlidersHorizontal,BrainCircuit,Boxes,History,FlaskConical,FileBarChart,Settings,LogOut,Menu,X,ChevronRight,Activity,ArrowUpRight} from 'lucide-vue-next'
+const route=useRoute(),router=useRouter(),auth=useAuth(),mobile=ref(false)
+const sections=[{name:'ESPACIO DE TRABAJO',links:[['/','Vista general',LayoutDashboard],['/datasets','Mis datasets',Database],['/preprocessing','Preprocesamiento',SlidersHorizontal]]},{name:'VISIÓN COMPUTACIONAL',links:[['/training','Entrenamientos',BrainCircuit],['/models','Modelos',Boxes],['/detection','Nueva inspección',ScanLine],['/inspections','Historial',History]]},{name:'INVESTIGACIÓN',links:[['/evaluations','Evaluación',FlaskConical],['/reports','Reportes',FileBarChart],['/jobs','Trabajos',Activity]]}]
+async function logout(){await auth.logout();router.push('/login')}
+const expire=()=>{auth.user=null;router.push('/login')};onMounted(()=>window.addEventListener('session-expired',expire));onBeforeUnmount(()=>window.removeEventListener('session-expired',expire))
+</script>
+<template>
+ <RouterView v-if="route.path==='/login'"/>
+ <div v-else class="min-h-screen">
+  <div v-if="mobile" class="fixed inset-0 z-30 bg-black/30 lg:hidden" @click="mobile=false"></div>
+  <aside class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-200 bg-white transition-transform lg:translate-x-0" :class="mobile?'translate-x-0':'-translate-x-full'">
+   <RouterLink to="/" class="flex items-center gap-3 px-7 py-7"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-forest text-lime"><Sprout :size="25"/></span><span class="text-2xl font-bold tracking-tight text-forest">hass<span class="font-normal">lab</span><span class="ml-1 text-emerald-500">.</span></span></RouterLink>
+   <div class="mx-5 mb-4 flex items-center gap-2 rounded-lg bg-[#f0f5e9] px-3 py-2 text-[11px] font-semibold text-forest"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> LABORATORIO DE VISIÓN · HASS</div>
+   <nav class="flex-1 overflow-auto px-4"><div v-for="section in sections" :key="section.name" class="mb-6"><p class="section-label px-3 pb-2 pt-2">{{section.name}}</p><RouterLink v-for="item in section.links" :key="String(item[0])" :to="String(item[0])" @click="mobile=false" class="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] transition" :class="(item[0]==='/'?route.path==='/':route.path.startsWith(String(item[0])))?'bg-forest font-semibold text-white shadow-sm':'text-slate-500 hover:bg-slate-50 hover:text-forest'"><component :is="item[2]" :size="18"/><span>{{item[1]}}</span></RouterLink></div></nav>
+   <div class="mx-5 mb-5 rounded-xl border border-[#e0e8d4] bg-[#f7f9f2] p-4"><p class="text-xs font-semibold text-forest">Investigación con evidencia</p><p class="mt-1 text-[11px] leading-relaxed text-slate-500">Imágenes, modelos y resultados trazables en un solo lugar.</p></div>
+   <RouterLink to="/settings" class="flex items-center gap-3 border-t border-slate-100 px-7 py-4 text-sm text-slate-500"><Settings :size="17"/>Configuración</RouterLink>
+  </aside>
+  <div class="lg:ml-64"><header class="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-slate-200/80 bg-[#f5f7f3]/95 px-5 backdrop-blur md:px-9"><div class="flex items-center gap-3"><button aria-label="Abrir menú" class="lg:hidden" @click="mobile=!mobile"><Menu/></button><span class="hidden text-xs text-slate-400 sm:inline">Workspace</span><ChevronRight class="hidden text-slate-300 sm:inline" :size="14"/><span class="text-sm font-medium">{{route.meta.title}}</span></div><div class="flex items-center gap-3"><div class="hidden text-right sm:block"><p class="text-xs font-semibold">{{auth.user?.first_name||auth.user?.username}}</p><p class="mt-0.5 text-[10px] text-slate-400">{{auth.user?.administrator?'Administrador':'Investigador'}}</p></div><span class="flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-[#e0eacb] text-xs font-bold text-forest">{{auth.user?.username?.slice(0,2).toUpperCase()}}</span><button aria-label="Cerrar sesión" title="Cerrar sesión" class="ml-2 text-slate-400 hover:text-forest" @click="logout"><LogOut :size="17"/></button></div></header>
+  <main class="mx-auto max-w-[1500px] p-5 md:p-9"><RouterView :key="route.path"/></main><footer class="flex justify-between px-9 pb-6 text-[10px] text-slate-400"><span>HassLab · Investigación en visión computacional</span><span>Lambayeque, Perú</span></footer></div>
+ </div>
+</template>

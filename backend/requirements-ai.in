@@ -1,0 +1,4 @@
+# Install into a worker environment after requirements.txt.
+# Resolve a CPU/CUDA-compatible torch/torchvision pair using pytorch.org first.
+ultralytics>=8.3,<9
+opencv-python-headless>=4.10,<5
