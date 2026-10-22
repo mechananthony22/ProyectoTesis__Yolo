@@ -63,3 +63,7 @@ Actualización: 2026-10-21 (America/Lima). Rama: `feat/hasslab-implementacion`. 
 ## Límites reales
 
 Sin dataset del usuario ni pesos de investigación disponibles: no hay resultados científicos. JWT está en memoria y recargar exige nuevo login. El cegamiento de la inspección manual requiere organización del protocolo: el propietario también puede consultar etiquetas en otros módulos. Los tiempos de CPU/GPU deben medirse en el equipo objetivo. El relleno blanco no elimina el fondo original; eliminación automática de fondo y generación sintética de entrenamiento no están habilitadas.
+
+## Corrección durante el smoke de navegador
+
+Run 39707779885: backend y frontend correctos; el navegador detectó que el aviso de importación se borraba inmediatamente. `usePage.act` reemplazaba el mensaje específico con una cadena vacía al terminar. Corregido y protegido con tres pruebas unitarias de notificaciones. El smoke usa ahora nombres únicos por intento para no reutilizar colecciones de un intento anterior. Se separan los archivos Vitest de los de Playwright. El nuevo CI debe confirmar el flujo completo antes de pasar a fase 07.

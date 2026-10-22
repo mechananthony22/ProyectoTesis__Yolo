@@ -1,6 +1,7 @@
 import {test, expect} from '@playwright/test'
 
 test('login, dataset import, annotation and responsive navigation', async ({page}, testInfo)=>{
+ const collectionName=`Smoke test ${testInfo.retry}-${Date.now()} · imágenes sintéticas`
  const pageErrors:string[]=[]
  page.on('pageerror',error=>pageErrors.push(error.message))
  await page.goto('/')
@@ -10,9 +11,9 @@ test('login, dataset import, annotation and responsive navigation', async ({page
  await expect(page.getByRole('heading',{name:/Hola, smoke/})).toBeVisible()
  await page.getByRole('link',{name:'Mis datasets',exact:true}).click()
  await page.getByRole('button',{name:'Registrar colección'}).click()
- await page.getByPlaceholder('Paltas Hass · Dataset de tesis').fill('Smoke test · imágenes sintéticas')
+ await page.getByPlaceholder('Paltas Hass · Dataset de tesis').fill(collectionName)
  await page.getByRole('button',{name:'Guardar colección'}).click()
- await page.getByRole('link',{name:/Smoke test/}).click()
+ await page.getByRole('link').filter({hasText:collectionName}).click()
  await page.locator('input[type=file]').setInputFiles({name:'fixture.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAHgAAABQCAIAAABd+SbeAAAAzElEQVR4nO3QQRHAIADAMEDXlCAH5VOx8liioNe5zzP43rod8BdGR4yOGB0xOmJ0xOiI0RGjI0ZHjI4YHTE6YnTE6IjREaMjRkeMjhgdMTpidMToiNERoyNGR4yOGB0xOmJ0xOiI0RGjI0ZHjI4YHTE6YnTE6IjREaMjRkeMjhgdMTpidMToiNERoyNGR4yOGB0xOmJ0xOiI0RGjI0ZHjI4YHTE6YnTE6IjREaMjRkeMjhgdMTpidMToiNERoyNGR4yOGB0xOmJ0xOjICxyPAbjJbgMjAAAAAElFTkSuQmCC','base64')})
  await page.getByRole('button',{name:/Importar 1 archivo/}).click()
  await expect(page.getByText('Importadas: 1.',{exact:false})).toBeVisible()
