@@ -141,7 +141,10 @@ class Job(Record):
 
 
 class ImageVariant(Record):
-    source_revision = models.PositiveIntegerField(null=True, help_text="Revisión de etiquetas usada al procesar; NULL en derivados anteriores sin trazabilidad.")
+    source_revision = models.PositiveIntegerField(
+        null=True,
+        help_text="Revisión de etiquetas usada al procesar; NULL en derivados anteriores sin trazabilidad.",
+    )
     image = models.ForeignKey(
         ImageAsset, on_delete=models.PROTECT, related_name="variants"
     )
@@ -155,6 +158,8 @@ class ImageVariant(Record):
 
 
 class TrainingRun(Record):
+    attempt = models.PositiveIntegerField(default=0)
+    duration_seconds = models.FloatField(null=True, validators=[MinValueValidator(0)])
     version = models.ForeignKey(
         DatasetVersion, on_delete=models.PROTECT, related_name="runs"
     )

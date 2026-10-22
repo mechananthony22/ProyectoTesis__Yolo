@@ -128,8 +128,10 @@ CELERY_TASK_ROUTES = {
 }
 CELERY_TASK_ALWAYS_EAGER = False
 AI_DEVICE = os.getenv("AI_DEVICE", "cpu")
-AI_RESOURCE_LOCK = str(BASE_DIR.parent / "storage/ai.lock")
+AI_RESOURCE_LOCK = os.getenv("AI_RESOURCE_LOCK", str(BASE_DIR.parent / "storage/ai.lock"))
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 X_FRAME_OPTIONS = "DENY"
+
+AI_BASE_WEIGHTS_DIR = Path(os.getenv("AI_BASE_WEIGHTS_DIR", str(BASE_DIR.parent / "storage/base-weights")))

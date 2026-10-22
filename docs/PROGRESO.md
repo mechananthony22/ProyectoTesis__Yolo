@@ -1,6 +1,6 @@
 # Estado de implementación — HassLab
 
-Actualización: 2026-10-21 (America/Lima). Rama: `feat/hasslab-implementacion`. PR: #1.
+Actualización: 2026-10-22 (America/Lima). Rama: `feat/hasslab-implementacion`. PR: #1.
 
 ## Cómo retomar
 
@@ -20,7 +20,7 @@ Actualización: 2026-10-21 (America/Lima). Rama: `feat/hasslab-implementacion`. 
 | 04. Anotación | Editor SVG, validación de cajas, revisión e historial implementados; pruebas API aprobadas |
 | 05. Preprocesamiento | Originales intactos, recorte/letterbox/brillo/contraste, cajas y revisión de origen. Diez pruebas específicas aprobadas; worker real con Redis/PostgreSQL aprobado en CI de fase 05 |
 | 06. Versiones | Snapshots, grupos train/val/test, ZIP YOLO y hashes de integridad. Seis pruebas específicas aprobadas; CI 39708069205 aprobado |
-| 07. Entrenamiento | Código inicial de integración y pantallas escritos. **Pendiente** fijar entorno AI y validar entrenamiento real mínimo, pesos, logs y métricas |
+| 07. Entrenamiento | Implementado: lock CPU, entrenamiento YOLOv8 real, progreso, intentos, artefactos y modelos inactivos. Smoke local real aprobado; ver `docs/fases/07-entrenamiento.md` y cierre CI al final |
 | 08. Inferencia | Código/pantallas escritos y pruebas con motor simulado. **Pendiente** validar con modelo YOLOv8 realmente entrenado |
 | 09. Dashboard/reportes | Código/pantallas escritos; exportaciones XLSX/PDF de inspecciones verificadas por pruebas. Pendiente revisión funcional final |
 | 10. Evaluación | Protocolo, muestras, observación manual, comparación pareada y exportación escritos; pruebas API aprobadas. Sin experimento científico realizado |
@@ -46,11 +46,10 @@ Actualización: 2026-10-21 (America/Lima). Rama: `feat/hasslab-implementacion`. 
 
 ## Próximo paso exacto
 
-1. Checkpoint 06 verificado: CI 39708069205 completó backend, frontend y browser-smoke con éxito. Continuar desde fase 07.
-2. **Continuar fase 07**: resolver una pareja CPU PyTorch/torchvision compatible, fijar Ultralytics/OpenCV (evitar dos distribuciones de OpenCV), generar lock del worker y comprobar `pip check`.
-3. Validar entrenamiento mínimo técnico con datos sintéticos identificados como fixture; comprobar pesos, métricas finitas, progreso por época, hashes y artefactos. No usar esos números en la tesis.
-4. Validar inferencia con ese modelo en fase 08; el entrenamiento/inferencia sobre el dataset real y GPU objetivo siguen pendientes de los archivos/hardware del usuario.
-5. Completar fases 09–11 y dejar Docker para la 12.
+1. Revisar el cierre de fase 07 y el CI de su commit antes de continuar.
+2. **Fase 08**: validar inferencia con pesos realmente entrenados, imágenes sin detecciones, coordenadas, tiempos y persistencia; no basta con el motor simulado.
+3. El dataset de investigación y la GPU del usuario aún no están disponibles. No declarar métricas científicas con fixtures técnicos.
+4. Completar fases 09–11; Docker permanece para fase 12.
 
 ## Archivos y migraciones de continuidad
 
@@ -74,3 +73,12 @@ Run 39707779885: backend y frontend correctos; el navegador detectó que el avis
 - `f4df830`: corrección del aviso de importación; tres pruebas unitarias de UI.
 - GitHub Actions **39708069205**: backend, frontend y browser-smoke **success**. Se validaron migraciones PostgreSQL, Redis/Celery real, pruebas, build y navegación móvil.
 - No quedan cambios de código pendientes de subir de estas fases. Este commit solo registra el resultado del CI. Próximo trabajo: **fase 07**, entorno AI y entrenamiento mínimo técnico. Docker sigue pendiente para fase 12.
+
+## Checkpoint fase 07 — 2026-10-22
+
+- Entrenamiento real YOLOv8n preentrenado, dos épocas en CPU, con figuras geométricas sintéticas identificadas como prueba técnica: aprobado. Se recargaron los pesos generados; no son evidencia científica ni modelos aptos para inspeccionar paltas.
+- Suite local en entorno worker nuevo: **53 passed, 2 skipped**; frontend **6 pruebas aprobadas** y build correcto. `pip check`, Django check y comprobación de migraciones correctos.
+- Lock Linux/Python 3.12: PyTorch CPU 2.14.1, torchvision 0.29.1, Ultralytics headless 8.4.183; único proveedor OpenCV comprobado.
+- Migración nueva: `0004_trainingrun_attempt_trainingrun_duration_seconds.py`.
+- CI amplía la prueba real a PostgreSQL + Redis + proceso Celery separado. Consultar el resultado del commit de fase 07 antes de declararlo aprobado.
+- El entorno local previo tenía binarios dañados; se creó `.venv-ai` limpio para las comprobaciones. No se incluye ningún entorno, imagen ni peso en Git.

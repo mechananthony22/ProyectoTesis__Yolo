@@ -119,6 +119,7 @@ class EvaluationSerializer(serializers.ModelSerializer):
 
 
 class TrainingInput(serializers.Serializer):
+    device = serializers.ChoiceField(choices=["server", "cpu"], default="server")
     version = serializers.UUIDField()
     architecture = serializers.ChoiceField(choices=["yolov8n.pt", "yolov8s.pt"])
     epochs = serializers.IntegerField(min_value=1, max_value=500, default=50)

@@ -59,7 +59,18 @@ Inicia Redis con tu instalación local y ejecuta, desde `backend/`:
 celery -A config worker -Q preprocessing --concurrency=1 --loglevel=info
 ```
 
-Para entrenamiento/inferencia debes preparar antes el entorno de IA. Consulta `backend/requirements-ai.in`: todavía no es un lock de IA verificado. Instala la pareja PyTorch/torchvision correspondiente a CPU o CUDA desde el selector oficial de PyTorch y resuelve Ultralytics con su dependencia OpenCV; evita instalar dos distribuciones distintas de OpenCV. El único modelo admitido inicialmente es detector de clase `0: rona`.
+El worker CPU tiene un lock independiente, probado en Linux x86_64 con Python 3.12. Crea un entorno nuevo (no mezcles dependencias del servidor ni del entorno Windows):
+
+```bash
+python3.12 -m venv .venv-ai
+source .venv-ai/bin/activate
+python -m pip install -r backend/requirements/worker-cpu.lock
+python -m pip check
+```
+
+Incluye PyTorch 2.14.1+cpu, torchvision 0.29.1+cpu y Ultralytics headless 8.4.183 con un único proveedor OpenCV. El lock instala también Django y Celery. Comparte con el servidor PostgreSQL, Redis, `storage/media/` y el archivo `AI_RESOURCE_LOCK`; los procesos deben ver los mismos archivos. No instales además `ultralytics` u otro OpenCV en este entorno. El detector inicialmente admite solo la clase `0: rona`.
+
+Para GPU, utiliza la pareja oficial PyTorch/torchvision compatible con tu CUDA y el lock común en un entorno separado; aún no se ha validado hardware GPU. Ver [fase 07](docs/fases/07-entrenamiento.md).
 
 Con el entorno AI preparado, ejecuta un worker de IA:
 

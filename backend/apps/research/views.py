@@ -328,6 +328,7 @@ class TrainingViewSet(ReadOnly):
             owned(m.DatasetVersion.objects.all(), request.user, "dataset__owner"),
             pk=data["version"],
         )
+        data["device"] = settings.AI_DEVICE if data["device"] == "server" else "cpu"
         data["version"] = str(data["version"])
         with transaction.atomic():
             job = m.Job.objects.create(owner=request.user, kind="training", config=data)
@@ -342,21 +343,31 @@ class TrainingViewSet(ReadOnly):
     @action(detail=True, methods=["get"])
     def artifacts(self, request, pk=None):
         run = self.get_object()
-        folder = Path(settings.MEDIA_ROOT) / "training-artifacts" / str(run.pk)
+        attempt = serializers.IntegerField(min_value=1).run_validation(
+            request.query_params.get("attempt", max(1, run.attempt))
+        )
+        if attempt > max(1, run.attempt):
+            raise ValidationError("Intento no disponible.")
+        root = Path(settings.MEDIA_ROOT) / "training-artifacts" / str(run.pk)
+        folder = root / f"attempt-{attempt}" / "fit"
+        # Legacy experiments stored their artifacts directly under the run folder.
+        if run.attempt == 0:
+            folder = root
+        allowed = {".png", ".csv", ".yaml", ".json", ".jsonl", ".pt", ".log"}
         filename = request.query_params.get("name")
         if filename:
-            if Path(filename).name != filename or Path(filename).suffix not in [
-                ".png",
-                ".csv",
-                ".yaml",
-            ]:
+            if Path(filename).name != filename or Path(filename).suffix not in allowed:
                 raise ValidationError("Archivo inválido.")
             path = folder / filename
             if not path.is_file():
                 raise ValidationError("Archivo no disponible.")
-            return FileResponse(path.open("rb"), filename=filename)
+            return FileResponse(path.open("rb"), as_attachment=True, filename=filename)
         return Response(
-            [p.name for p in folder.iterdir() if p.is_file()] if folder.exists() else []
+            sorted(
+                p.name for p in folder.iterdir() if p.is_file() and p.suffix in allowed
+            )
+            if folder.exists()
+            else []
         )
 
 
@@ -929,7 +940,9 @@ class AuditViewSet(ReadOnly):
     def get_queryset(self):
         return owned(m.AuditEvent.objects.all(), self.request.user, "actor")
 
+
 # Attach explicit contracts once, before router registration.
 import sys
 from .schema import annotate_views
+
 annotate_views(sys.modules[__name__])

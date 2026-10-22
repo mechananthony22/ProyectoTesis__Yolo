@@ -1,6 +1,7 @@
 import hashlib
 import platform
 import shutil
+import json
 import tempfile
 import zipfile
 from pathlib import Path
@@ -24,28 +25,22 @@ from .models import (
 @contextmanager
 def execution(job_id, ai=False):
     from filelock import FileLock, Timeout
+    import logging
 
     if not Job.objects.filter(pk=job_id, state="queued").update(
-        state="running", started_at=timezone.now(), error="", progress=1
+        state="running",
+        started_at=timezone.now(),
+        finished_at=None,
+        error="",
+        progress=1,
+        updated_at=timezone.now(),
     ):
         yield None
         return
     job = Job.objects.get(pk=job_id)
     lock = None
-    try:
-        if ai:
-            Path(settings.AI_RESOURCE_LOCK).parent.mkdir(parents=True, exist_ok=True)
-            lock = FileLock(settings.AI_RESOURCE_LOCK, timeout=1)
-            lock.acquire()
-        yield job
-        job.refresh_from_db()
-        job.state = "succeeded"
-        job.progress = 100
-        job.finished_at = timezone.now()
-        job.save()
-    except Exception as exc:
-        import logging
 
+    def failed(exc):
         logging.getLogger(__name__).exception("Job failed: %s", job_id)
         Job.objects.filter(pk=job_id).update(
             state="failed",
@@ -55,7 +50,28 @@ def execution(job_id, ai=False):
                 else f"{type(exc).__name__}: {str(exc)[:500]}"
             ),
             finished_at=timezone.now(),
+            updated_at=timezone.now(),
         )
+
+    if ai:
+        try:
+            Path(settings.AI_RESOURCE_LOCK).parent.mkdir(parents=True, exist_ok=True)
+            lock = FileLock(settings.AI_RESOURCE_LOCK, timeout=1)
+            lock.acquire()
+        except Exception as exc:
+            failed(exc)
+            # A contextmanager must yield even when acquisition fails.
+            yield None
+            return
+    try:
+        yield job
+        job.refresh_from_db()
+        job.state = "succeeded"
+        job.progress = 100
+        job.finished_at = timezone.now()
+        job.save()
+    except Exception as exc:
+        failed(exc)
     finally:
         if lock is not None:
             lock.release()
@@ -76,7 +92,9 @@ def preprocess(job_id):
             with image.file.open("rb") as f:
                 data = f.read()
             if hashlib.sha256(data).hexdigest() != image.sha256:
-                raise ValueError("El original no coincide con su hash; no se generó el derivado.")
+                raise ValueError(
+                    "El original no coincide con su hash; no se generó el derivado."
+                )
             output, boxes = transform(data, image.annotations, recipe)
             variant = ImageVariant(
                 image=image,
@@ -133,71 +151,129 @@ def unpack(version, folder):
 
 @shared_task
 def train(job_id):
+    from ai.training import train_model, environment, finite_metrics
+    from django.db import transaction
+
     with execution(job_id, ai=True) as job:
         if job is None:
             return
-        from ultralytics import YOLO
-        import torch
-        import ultralytics
+        run = TrainingRun.objects.select_related("version").get(job=job)
+        run.attempt += 1
+        run.epochs_log = []
+        run.metrics = {}
+        run.duration_seconds = None
+        device = job.config.get("device", settings.AI_DEVICE)
+        output = (
+            Path(settings.MEDIA_ROOT)
+            / "training-artifacts"
+            / str(run.pk)
+            / f"attempt-{run.attempt}"
+        )
+        fit = output / "fit"
+        fit.mkdir(parents=True, exist_ok=True)
+        run.environment = {
+            **environment(device),
+            "dataset_version": str(run.version_id),
+            "dataset_hash": run.version.manifest_hash,
+            "archive_sha256": run.version.archive_sha256,
+            "attempt": run.attempt,
+        }
+        run.save()
+        started = perf_counter()
 
-        run = TrainingRun.objects.get(job=job)
-        with tempfile.TemporaryDirectory() as folder:
-            data = unpack(run.version, folder)
-            model = YOLO(run.architecture)
+        def epoch(number, metrics):
+            # Replace duplicate final-validation callbacks rather than adding a second epoch.
+            entry = {"epoch": number, "metrics": finite_metrics(metrics)}
+            run.epochs_log = [
+                row for row in run.epochs_log if row["epoch"] != number
+            ] + [entry]
+            run.save(update_fields=["epochs_log", "updated_at"])
+            with (fit / "training.jsonl").open("a", encoding="utf-8") as stream:
+                stream.write(json.dumps(entry, allow_nan=False) + "\n")
+            Job.objects.filter(pk=job.pk).update(
+                progress=min(95, int(number / job.config["epochs"] * 95)),
+                updated_at=timezone.now(),
+            )
 
-            def epoch(trainer):
-                metrics = {k: float(v) for k, v in trainer.metrics.items()}
-                run.epochs_log.append({"epoch": trainer.epoch + 1, "metrics": metrics})
-                run.save(update_fields=["epochs_log"])
-                Job.objects.filter(pk=job.pk).update(
-                    progress=min(
-                        95, int((trainer.epoch + 1) / job.config["epochs"] * 95)
-                    )
+        def started_model(metadata):
+            run.environment.update(metadata)
+            run.save(update_fields=["environment", "updated_at"])
+
+        try:
+            with tempfile.TemporaryDirectory() as folder:
+                data = unpack(run.version, folder)
+                config = {
+                    k: v
+                    for k, v in job.config.items()
+                    if k not in ["version", "architecture", "device"]
+                }
+                result = train_model(
+                    data_yaml=data,
+                    architecture=run.architecture,
+                    weights_dir=settings.AI_BASE_WEIGHTS_DIR,
+                    output_dir=output,
+                    parameters=config,
+                    device=device,
+                    on_epoch=epoch,
+                    on_start=started_model,
                 )
-
-            model.add_callback("on_fit_epoch_end", epoch)
-            config = {
-                k: v
-                for k, v in job.config.items()
-                if k not in ["version", "architecture"]
-            }
-            run.environment = {
-                "python": platform.python_version(),
-                "torch": torch.__version__,
-                "ultralytics": ultralytics.__version__,
-                "device": settings.AI_DEVICE,
-                "platform": platform.platform(),
-                "cuda": torch.version.cuda,
-                "dataset_hash": run.version.manifest_hash,
-            }
-            run.save(update_fields=["environment"])
-            results = model.train(
-                data=data,
-                project=str(Path(folder) / "runs"),
-                name="training",
-                device=settings.AI_DEVICE,
-                workers=0,
-                plots=True,
-                **config,
+                run.environment["effective_parameters"] = result.get(
+                    "effective_parameters"
+                )
+                run.metrics = result["metrics"]
+                run.duration_seconds = result["duration_seconds"]
+                contents = Path(result["best"]).read_bytes()
+                for kind in ("best", "last"):
+                    source = Path(result[kind])
+                    if source.is_file():
+                        shutil.copy2(source, fit / f"{kind}.pt")
+                metadata = {
+                    "run_id": str(run.pk),
+                    "configuration": job.config,
+                    "environment": run.environment,
+                    "duration_seconds": run.duration_seconds,
+                    "metrics": run.metrics,
+                    "weights_sha256": result["weights_sha256"],
+                }
+                (fit / "experiment.json").write_text(
+                    json.dumps(metadata, indent=2, allow_nan=False), encoding="utf-8"
+                )
+                (fit / "metrics.json").write_text(
+                    json.dumps(run.metrics, indent=2, allow_nan=False), encoding="utf-8"
+                )
+                with transaction.atomic():
+                    trained = AIModel(
+                        run=run,
+                        name=f"{run.architecture.removesuffix('.pt')} · {str(run.pk)[:8]}",
+                        sha256=result["weights_sha256"],
+                    )
+                    trained.weights.save(
+                        f"{trained.pk}.pt", ContentFile(contents), save=False
+                    )
+                    trained.save()
+                    run.save(
+                        update_fields=[
+                            "metrics",
+                            "duration_seconds",
+                            "environment",
+                            "updated_at",
+                        ]
+                    )
+                    job.result = {
+                        "model_id": str(trained.pk),
+                        "metrics": run.metrics,
+                        "attempt": run.attempt,
+                        "duration_seconds": run.duration_seconds,
+                    }
+                    job.save(update_fields=["result"])
+        except Exception as exc:
+            run.duration_seconds = perf_counter() - started
+            run.save(update_fields=["duration_seconds", "updated_at"])
+            (fit / "failure.json").write_text(
+                json.dumps({"type": type(exc).__name__, "detail": str(exc)[:1000]}),
+                encoding="utf-8",
             )
-            run.metrics = {k: float(v) for k, v in results.results_dict.items()}
-            run.save(update_fields=["metrics"])
-            weights = Path(model.trainer.best)
-            contents = weights.read_bytes()
-            trained = AIModel(
-                run=run,
-                name=f"{run.architecture.removesuffix('.pt')} · {str(run.pk)[:8]}",
-                sha256=hashlib.sha256(contents).hexdigest(),
-            )
-            trained.weights.save(f"{trained.pk}.pt", ContentFile(contents))
-            # Persist curves and logs alongside weights, accessible through a protected endpoint.
-            artifacts = Path(settings.MEDIA_ROOT) / "training-artifacts" / str(run.pk)
-            artifacts.mkdir(parents=True, exist_ok=True)
-            for path in Path(model.trainer.save_dir).iterdir():
-                if path.is_file() and path.suffix in [".png", ".csv", ".yaml"]:
-                    shutil.copy2(path, artifacts / path.name)
-            job.result = {"model_id": str(trained.pk), "metrics": run.metrics}
-            job.save(update_fields=["result"])
+            raise
 
 
 @shared_task
