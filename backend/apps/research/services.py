@@ -268,16 +268,18 @@ def freeze(dataset, user, seed, variant_ids):
             "path: .\ntrain: images/train\nval: images/val\ntest: images/test\nnames:\n  0: rona\n",
         )
     number = (dataset.versions.aggregate(n=Max("number"))["n"] or 0) + 1
+    archive_contents = buffer.getvalue()
     version = DatasetVersion(
         dataset=dataset,
         number=number,
         seed=seed,
         manifest=manifest,
         manifest_hash=hashlib.sha256(raw).hexdigest(),
+        archive_sha256=hashlib.sha256(archive_contents).hexdigest(),
         created_by=user,
     )
     version.archive.save(
-        f"{version.pk}.zip", ContentFile(buffer.getvalue()), save=False
+        f"{version.pk}.zip", ContentFile(archive_contents), save=False
     )
     version.save()
     audit(user, "dataset.freeze", version, {"number": number})
@@ -295,3 +297,21 @@ def dispatch(job, task):
         )
     job.refresh_from_db()
     return job
+
+
+def verify_version_archive(version):
+    """Verify a frozen snapshot before download or worker extraction."""
+    if not version.archive_sha256:
+        raise ValidationError("Esta versión antigua no tiene hash del ZIP. Congela una nueva versión antes de usarla.")
+    digest = hashlib.sha256()
+    with version.archive.open("rb") as archive_file:
+        for block in archive_file.chunks():
+            digest.update(block)
+    if digest.hexdigest() != version.archive_sha256:
+        raise ValidationError("El ZIP de esta versión fue modificado o está corrupto; no se utilizará.")
+    expected = json.dumps(version.manifest, sort_keys=True).encode()
+    if hashlib.sha256(expected).hexdigest() != version.manifest_hash:
+        raise ValidationError("El manifiesto no coincide con su hash; no se utilizará la versión.")
+    with zipfile.ZipFile(version.archive.path) as archive:
+        if archive.read("manifest.json") != expected:
+            raise ValidationError("El manifiesto del ZIP no coincide con la versión congelada.")

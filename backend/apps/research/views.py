@@ -236,7 +236,9 @@ class VersionViewSet(ReadOnly):
 
     @action(detail=True, methods=["get"])
     def download(self, request, pk=None):
-        return file_response(self.get_object().archive, "dataset-yolo.zip", True)
+        version = self.get_object()
+        services.verify_version_archive(version)
+        return file_response(version.archive, "dataset-yolo.zip", True)
 
 
 class VariantViewSet(ReadOnly):

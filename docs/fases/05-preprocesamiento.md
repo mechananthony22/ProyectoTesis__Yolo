@@ -19,7 +19,7 @@ Estas son pruebas de código con imágenes sintéticas simples; no son resultado
 
 ## Redis y worker real
 
-Se incorpora una prueba CI que lanza un proceso Celery real, publica en Redis y verifica la creación del derivado en PostgreSQL. Solo se habilita con `REDIS_INTEGRATION=1`. El resultado se debe registrar al finalizar GitHub Actions; la prueba local se omite si faltan los servicios.
+Se incorpora una prueba CI que lanza un proceso Celery real, publica en Redis y verifica la creación del derivado en PostgreSQL. Solo se habilita con `REDIS_INTEGRATION=1`. Resultado confirmado: GitHub Actions run 39707473699 completó backend y frontend con éxito, incluyendo el caso de worker real habilitado. La prueba local se omite si faltan los servicios.
 
 ## Alcance
 

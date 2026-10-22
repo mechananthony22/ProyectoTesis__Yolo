@@ -1,82 +1,65 @@
 # Estado de implementación — HassLab
 
-Última actualización: 2026-10-21 (America/Lima).
-Rama de trabajo: `feat/hasslab-implementacion`.
+Actualización: 2026-10-21 (America/Lima). Rama: `feat/hasslab-implementacion`. PR: #1.
 
-## Instrucciones de continuidad
+## Cómo retomar
 
-1. Leer este archivo y `docs/fase-01-arquitectura.md` antes de continuar.
-2. Revisar `git status` y no sobrescribir cambios ajenos.
-3. Trabajar por fase. Al terminar una fase, anotar archivos, pruebas reales, limitaciones y siguiente paso; hacer commit y subirlo a GitHub.
-4. No llamar «terminada» a una fase por tener archivos: verificar sus flujos.
-5. No inventar precisión, recall, mAP, tiempos ni resultados de la tesis.
-6. El usuario ya tiene dataset; el sistema lo importa y administra. Vue 3 + TypeScript + Tailwind CSS. Backend Django REST Framework y PostgreSQL. Docker al final.
+1. Leer este archivo y el documento de la última fase en `docs/fases/`.
+2. Consultar el head remoto y los resultados del CI del último commit; no asumir que un archivo escrito equivale a una funcionalidad validada.
+3. Conservar cambios locales ajenos y trabajar por fase. Al terminar cada fase, actualizar este `.md`, registrar pruebas/limitaciones y subir un commit.
+4. Dataset del usuario ya existente; Vue 3 + TypeScript + Tailwind. Django REST Framework/PostgreSQL. Docker al final.
+5. No inventar precisión, recall, mAP, tiempos ni resultados de investigación.
 
-## Checkpoint 05: preprocesamiento con trazabilidad de etiquetas
+## Estado por fase
 
-Se ha escrito un primer corte transversal del sistema. Está **en desarrollo**, no validado integralmente. Se conserva en Git para poder continuar sin perder trabajo. `main` conserva la planificación aprobada; la implementación se revisa en esta rama.
+| Fase | Estado y evidencia |
+|---|---|
+| 01. Arquitectura | Documento original en `docs/fase-01-arquitectura.md`; implementación agrupa dominio de investigación en `apps/research` y motor independiente en `backend/ai` |
+| 02. Base, diseño y acceso | Backend/JWT/roles y build Vue/Tailwind verificados. CI PostgreSQL 17 aprobado. Smoke visual en CI añadido, pendiente de su resultado |
+| 03. Dataset | Importación ZIP/YOLO/imágenes, galería y permisos implementados; pruebas aprobadas |
+| 04. Anotación | Editor SVG, validación de cajas, revisión e historial implementados; pruebas API aprobadas |
+| 05. Preprocesamiento | Originales intactos, recorte/letterbox/brillo/contraste, cajas y revisión de origen. Diez pruebas específicas aprobadas; worker real con Redis/PostgreSQL aprobado en CI de fase 05 |
+| 06. Versiones | Snapshots, grupos train/val/test, ZIP YOLO y hashes de integridad. Seis pruebas específicas aprobadas; CI de este checkpoint pendiente |
+| 07. Entrenamiento | Código inicial de integración y pantallas escritos. **Pendiente** fijar entorno AI y validar entrenamiento real mínimo, pesos, logs y métricas |
+| 08. Inferencia | Código/pantallas escritos y pruebas con motor simulado. **Pendiente** validar con modelo YOLOv8 realmente entrenado |
+| 09. Dashboard/reportes | Código/pantallas escritos; exportaciones XLSX/PDF de inspecciones verificadas por pruebas. Pendiente revisión funcional final |
+| 10. Evaluación | Protocolo, muestras, observación manual, comparación pareada y exportación escritos; pruebas API aprobadas. Sin experimento científico realizado |
+| 11. Documentación/calidad | README de instalación, suite y CI. Pendiente completar manuales, resolver advertencias restantes de OpenAPI y validación visual final |
+| 12. Docker/despliegue | Pendiente; se hará al terminar validaciones locales |
 
-| Fase | Estado | Código preparado |
-|---|---|---|
-| 01. Planificación | Documentada; actualizar decisiones de implementación | Documento original y este seguimiento |
-| 02. Base, diseño y acceso | Backend y build verificados; prueba visual pendiente | Django settings, usuario/roles/JWT, migraciones, Vue/Router/Pinia/Tailwind, layout y login |
-| 03. Importación y dataset | API verificada | API importación ZIP/imágenes, galería, duplicados, procedencia y permisos |
-| 04. Anotaciones | API verificada; prueba visual pendiente | Editor SVG, cajas normalizadas, revisión humana, historial |
-| 05. Preprocesamiento | Código verificado; worker real en CI pendiente de confirmar | Letterbox, recorte/brillo/contraste, derivados y transformación de cajas |
-| 06. Versiones del dataset | Implementada, pendiente de pruebas | Split por grupo, snapshots, manifiestos y ZIP YOLO |
-| 07. Entrenamiento | Integración escrita; sin entrenamiento real | Celery, YOLOv8, epochs/métricas/modelos y exclusión de recursos AI |
-| 08. Detección e historial | Integración escrita; pendiente de pruebas | Carga/lotes/cámara, inferencia, revisión e historial |
-| 09. Dashboard/reportes | Implementada, pendiente de pruebas | Estadísticas reales, gráficos, exportación de inspecciones XLSX/PDF |
-| 10. Evaluación experimental | Implementación parcial | Protocolo, muestras test, observación manual, evaluación YOLO, resumen pareado y exportación de evidencia |
-| 11. Pruebas/documentación | En curso | `manage.py check` sin errores; faltan pruebas API/servicios, build final, manuales y CI |
-| 12. Docker/despliegue | No iniciada | Se hará después de validar el funcionamiento local |
+## Checkpoints publicados
 
-## Arquitectura implementada
+- `ea31137`: implementación transversal inicial, marcada WIP.
+- `1eb56fd`: base, CI y autenticación. Run 39619785356 exitoso en PostgreSQL 17.
+- `39294c9`: cierres 03–04, correcciones OpenAPI, suite ampliada y README de instalación.
+- `fbe744e`: fase 05, revisión de origen en derivados y prueba real del worker. Run 39707473699: backend/frontend exitosos.
+- Checkpoint fase 06: hashes del ZIP y del manifiesto, migración 0003, seis pruebas nuevas y smoke Playwright en CI. Consultar el head del PR para su SHA y resultados.
 
-- `frontend/src/views/`: pantallas por módulo, con Tailwind.
-- `frontend/src/components/`: editor de cajas, imagen privada, estados y avisos.
-- `frontend/src/services/`: cliente API, descarga y manejo de errores.
-- `backend/apps/accounts/`: usuarios, roles y perfil.
-- `backend/apps/research/`: dominio de investigación, serializers, servicios, API y tareas.
-- `backend/ai/`: procesamiento/inferencia/evaluación sin dependencia de las vistas HTTP.
-- Se agrupan inicialmente las entidades de investigación en una app Django para mantener las transacciones y relaciones coherentes. Las pantallas y servicios mantienen responsabilidades diferenciadas; evitar crear apps vacías.
+## Verificación al cerrar este checkpoint
 
-## Verificado hasta este checkpoint
-
-- Instalación del entorno Python 3.12 y dependencias web realizada; versiones resueltas en `backend/requirements.txt`.
-- `python backend/manage.py check --settings=config.test_settings`: sin errores.
-- Generadas migraciones iniciales para usuario personalizado y dominio de investigación.
-- Dependencias frontend instaladas y `package-lock.json` generado.
-- Build frontend completado: TypeScript y Vite correctos (1687 módulos).
-- PostgreSQL 17 verificado en GitHub Actions run 39619785356: migraciones y suite correctas. Falta integración real Redis/worker y YOLO.
+- `pytest backend/tests -q`: **44 passed, 1 skipped**. SQLite aislado en local; el caso omitido requiere los servicios reales de CI.
+- `manage.py check --settings=config.test_settings`: sin errores.
+- `npm run build`: TypeScript/Vite correctos.
+- `compileall backend`: correcto.
+- CI fase 05: PostgreSQL 17, migraciones, suite con Redis/Celery real y build frontend correctos.
+- Playwright: descarga de Chromium local falló por ZIP incompleto. Se añadió job CI; **consultar su resultado**. No hay evidencia de prueba visual local.
 
 ## Próximo paso exacto
 
-1. Base frontend compilada; 4 pruebas de autenticación aprobadas. Consultar `docs/fases/02-base.md`.
-2. Pruebas de auth/dataset aprobadas (16); 12 pruebas adicionales de procesamiento/reportes/evaluación también pasan. Revisar mejoras de trazabilidad y pruebas visuales.
-3. Exportación de evaluación implementada; falta comprobar su contenido y permisos.
-4. Validar entorno PostgreSQL y migraciones; SQLite se usa solo en pruebas aisladas.
-5. Revisar OpenAPI, errores HTTP, dependencias AI (OpenCV headless/Ultralytics) y pruebas visuales del frontend.
-6. Cerrar fase 02 con evidencia, continuar cierres de fases 03–10 y documentar límites reales.
-7. Crear README/manuales/CI. Docker al final.
+1. Revisar resultados del CI del checkpoint 06: backend, frontend y browser-smoke. Corregir cualquier fallo antes de cerrar la validación visual.
+2. **Continuar fase 07**: resolver una pareja CPU PyTorch/torchvision compatible, fijar Ultralytics/OpenCV (evitar dos distribuciones de OpenCV), generar lock del worker y comprobar `pip check`.
+3. Validar entrenamiento mínimo técnico con datos sintéticos identificados como fixture; comprobar pesos, métricas finitas, progreso por época, hashes y artefactos. No usar esos números en la tesis.
+4. Validar inferencia con ese modelo en fase 08; el entrenamiento/inferencia sobre el dataset real y GPU objetivo siguen pendientes de los archivos/hardware del usuario.
+5. Completar fases 09–11 y dejar Docker para la 12.
 
-## Límites que no deben confundirse con resultados
+## Archivos y migraciones de continuidad
 
-- Sin dataset del usuario ni pesos entrenados disponibles: no hay resultados científicos.
-- Tokens JWT en memoria: recargar la página obliga a iniciar sesión; documentado en Configuración.
-- La observación manual presenta muestras sin referencia/predicción, pero el dueño del dataset puede consultar sus anotaciones en otro módulo. El cegamiento experimental requiere organización de participantes y protocolo.
-- Las pruebas de latencia y de GPU deben realizarse en el equipo objetivo.
+- `backend/apps/research/migrations/0002_imagevariant_source_revision.py`: derivados antiguos con NULL necesitan regeneración antes de congelar.
+- `0003_datasetversion_archive_sha256.py`: versiones antiguas sin hash necesitan nuevo snapshot.
+- `backend/tests/test_worker_integration.py`: proceso Celery real habilitado con `REDIS_INTEGRATION=1`; requiere PostgreSQL/Redis.
+- `frontend/tests/e2e/laboratory.spec.ts` y `scripts/smoke_server.py`: smoke con base temporal y datos sintéticos. Nunca usar ese servidor para investigación/producción.
+- `README.md`: instalación local y ejecución de servidores/workers.
 
-### Registro de checkpoints
-- `ea31137`: código inicial de todos los módulos, pendiente de validación.
-- Checkpoint 02: pruebas de autenticación, build corregido, CI PostgreSQL preparado y registro de fase 02.
+## Límites reales
 
-- `1eb56fd`: base, CI y pruebas. GitHub Actions 39619785356 exitoso en PostgreSQL 17.
-- Fases 03 y 04 documentadas en `docs/fases/`. 28 pruebas locales aprobadas al retomar el chat (corregida reapertura del archivo en una prueba).
-
-## Retoma de sesión
-
-Se confirmó que la subida anterior se detuvo por límite de uso. Último commit publicado confirmado: `1eb56fd`. Los cierres 03–04 se publican en el próximo checkpoint; README local agregado. Fases 03–04 publicadas en `39294c9`. Fase 05 reforzada con revisión de etiquetas y diez pruebas específicas aprobadas. Próxima fase de código: 06 (versiones y exportación).
-
-- `39294c9`: cierres de dataset/anotaciones, OpenAPI y README.
-- Fase 05: migración 0002 añade `ImageVariant.source_revision`; derivados anteriores con NULL requieren regeneración antes de congelar. Prueba real Redis/Celery añadida al CI; resultado pendiente.
+Sin dataset del usuario ni pesos de investigación disponibles: no hay resultados científicos. JWT está en memoria y recargar exige nuevo login. El cegamiento de la inspección manual requiere organización del protocolo: el propietario también puede consultar etiquetas en otros módulos. Los tiempos de CPU/GPU deben medirse en el equipo objetivo. El relleno blanco no elimina el fondo original; eliminación automática de fondo y generación sintética de entrenamiento no están habilitadas.

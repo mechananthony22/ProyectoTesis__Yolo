@@ -103,6 +103,7 @@ class DatasetVersion(Record):
     seed = models.PositiveIntegerField(default=42)
     manifest = models.JSONField(default=list)
     manifest_hash = models.CharField(max_length=64)
+    archive_sha256 = models.CharField(max_length=64, blank=True, default="")
     archive = models.FileField(upload_to="versions")
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
 
