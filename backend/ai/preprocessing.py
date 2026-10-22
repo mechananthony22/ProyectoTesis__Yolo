@@ -1,14 +1,25 @@
 import io
+import math
 from PIL import Image, ImageEnhance
 
 
 def transform(data, boxes, recipe):
+    if recipe.get("size") not in (640, 800):
+        raise ValueError("La resolución debe ser 640 u 800.")
+    for key in ("brightness", "contrast"):
+        value = float(recipe.get(key, 1))
+        if not math.isfinite(value) or not 0.5 <= value <= 1.5:
+            raise ValueError("Brillo y contraste deben estar entre 0.5 y 1.5.")
     image = Image.open(io.BytesIO(data)).convert("RGB")
     width, height = image.size
     crop = recipe.get("crop", [0, 0, 1, 1])
+    if len(crop) != 4 or not all(math.isfinite(v) and 0 <= v <= 1 for v in crop):
+        raise ValueError("Recorte normalizado inválido.")
     left, top, right, bottom = [
         round(v * n) for v, n in zip(crop, [width, height, width, height])
     ]
+    if right <= left or bottom <= top:
+        raise ValueError("El recorte debe conservar al menos un píxel en cada dimensión.")
     image = image.crop((left, top, right, bottom))
     cw, ch = image.size
     target = recipe["size"]

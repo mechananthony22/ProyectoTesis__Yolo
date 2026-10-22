@@ -228,6 +228,8 @@ def freeze(dataset, user, seed, variant_ids):
             selected = image
             if str(image.pk) in variant_ids:
                 selected = image.variants.get(pk=variant_ids[str(image.pk)])
+                if selected.source_revision is None or selected.source_revision != image.revision:
+                    raise ValidationError("Un derivado usa una revisión anterior de las etiquetas. Regénéralo y revísalo antes de congelar.")
             data = selected.file.read()
             selected.file.close()
             digest = hashlib.sha256(data).hexdigest()
@@ -257,6 +259,8 @@ def freeze(dataset, user, seed, variant_ids):
                     "variant_accepted_by": user.pk if selected is not image else None,
                 }
             )
+        if not any(item["annotations"] for item in manifest if item["split"] == "train"):
+            raise ValidationError("Los archivos seleccionados para train no contienen lesiones anotadas. Revisa los recortes.")
         raw = json.dumps(manifest, sort_keys=True).encode()
         archive.writestr("manifest.json", raw)
         archive.writestr(

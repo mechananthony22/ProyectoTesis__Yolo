@@ -140,6 +140,7 @@ class Job(Record):
 
 
 class ImageVariant(Record):
+    source_revision = models.PositiveIntegerField(null=True, help_text="Revisión de etiquetas usada al procesar; NULL en derivados anteriores sin trazabilidad.")
     image = models.ForeignKey(
         ImageAsset, on_delete=models.PROTECT, related_name="variants"
     )

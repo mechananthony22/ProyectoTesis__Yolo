@@ -75,10 +75,13 @@ def preprocess(job_id):
                 continue
             with image.file.open("rb") as f:
                 data = f.read()
+            if hashlib.sha256(data).hexdigest() != image.sha256:
+                raise ValueError("El original no coincide con su hash; no se generó el derivado.")
             output, boxes = transform(data, image.annotations, recipe)
             variant = ImageVariant(
                 image=image,
                 job=job,
+                source_revision=image.revision,
                 recipe=recipe,
                 annotations=boxes,
                 width=recipe["size"],

@@ -12,7 +12,7 @@ Rama de trabajo: `feat/hasslab-implementacion`.
 5. No inventar precisión, recall, mAP, tiempos ni resultados de la tesis.
 6. El usuario ya tiene dataset; el sistema lo importa y administra. Vue 3 + TypeScript + Tailwind CSS. Backend Django REST Framework y PostgreSQL. Docker al final.
 
-## Checkpoint 03–04: base verificada en PostgreSQL, dataset y anotaciones probados
+## Checkpoint 05: preprocesamiento con trazabilidad de etiquetas
 
 Se ha escrito un primer corte transversal del sistema. Está **en desarrollo**, no validado integralmente. Se conserva en Git para poder continuar sin perder trabajo. `main` conserva la planificación aprobada; la implementación se revisa en esta rama.
 
@@ -22,7 +22,7 @@ Se ha escrito un primer corte transversal del sistema. Está **en desarrollo**, 
 | 02. Base, diseño y acceso | Backend y build verificados; prueba visual pendiente | Django settings, usuario/roles/JWT, migraciones, Vue/Router/Pinia/Tailwind, layout y login |
 | 03. Importación y dataset | API verificada | API importación ZIP/imágenes, galería, duplicados, procedencia y permisos |
 | 04. Anotaciones | API verificada; prueba visual pendiente | Editor SVG, cajas normalizadas, revisión humana, historial |
-| 05. Preprocesamiento | Implementada, pendiente de pruebas del worker | Letterbox, recorte/brillo/contraste, derivados y transformación de cajas |
+| 05. Preprocesamiento | Código verificado; worker real en CI pendiente de confirmar | Letterbox, recorte/brillo/contraste, derivados y transformación de cajas |
 | 06. Versiones del dataset | Implementada, pendiente de pruebas | Split por grupo, snapshots, manifiestos y ZIP YOLO |
 | 07. Entrenamiento | Integración escrita; sin entrenamiento real | Celery, YOLOv8, epochs/métricas/modelos y exclusión de recursos AI |
 | 08. Detección e historial | Integración escrita; pendiente de pruebas | Carga/lotes/cámara, inferencia, revisión e historial |
@@ -76,4 +76,7 @@ Se ha escrito un primer corte transversal del sistema. Está **en desarrollo**, 
 
 ## Retoma de sesión
 
-Se confirmó que la subida anterior se detuvo por límite de uso. Último commit publicado confirmado: `1eb56fd`. Los cierres 03–04 se publican en el próximo checkpoint; README local agregado. Próxima fase de código: 05 (trazabilidad y validación de derivados), luego 06 (versiones y exportación).
+Se confirmó que la subida anterior se detuvo por límite de uso. Último commit publicado confirmado: `1eb56fd`. Los cierres 03–04 se publican en el próximo checkpoint; README local agregado. Fases 03–04 publicadas en `39294c9`. Fase 05 reforzada con revisión de etiquetas y diez pruebas específicas aprobadas. Próxima fase de código: 06 (versiones y exportación).
+
+- `39294c9`: cierres de dataset/anotaciones, OpenAPI y README.
+- Fase 05: migración 0002 añade `ImageVariant.source_revision`; derivados anteriores con NULL requieren regeneración antes de congelar. Prueba real Redis/Celery añadida al CI; resultado pendiente.

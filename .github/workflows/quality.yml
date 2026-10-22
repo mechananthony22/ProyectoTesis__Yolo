@@ -30,6 +30,7 @@ jobs:
       POSTGRES_PASSWORD: test-only-password
       POSTGRES_HOST: localhost
       DJANGO_SETTINGS_MODULE: config.ci_settings
+      REDIS_INTEGRATION: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
