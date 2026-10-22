@@ -15,7 +15,7 @@
 - 4 pruebas de autenticación aprobadas: login/refresh/logout, usuario inactivo, creación de usuario/contraseña y prevención de escalamiento de rol.
 - `npm run build`: TypeScript y Vite completados, 1687 módulos transformados.
 - `manage.py check --settings=config.test_settings`: sin errores.
-- GitHub Actions run 39619785356: backend y frontend completados con éxito. PostgreSQL 17: migraciones, check y suite aprobados. La prueba visual en navegador está en curso.
+- GitHub Actions run 39619785356: backend y frontend completados con éxito. PostgreSQL 17: migraciones, check y suite aprobados. La prueba visual de login, navegación y ancho móvil también pasó en el run 39708069205.
 
 ## Cómo probar
 

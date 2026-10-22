@@ -16,7 +16,7 @@ Seis pruebas específicas aprobadas: descarga/desempaquetado correcto, ZIP corru
 
 Suite local completa: **44 aprobadas, una omitida**. La omitida requiere PostgreSQL/Redis reales y se habilita en CI. Build frontend y `manage.py check` correctos.
 
-CI de la fase anterior (run 39707473699): backend y frontend exitosos, con PostgreSQL 17, Redis y el test que inicia un proceso Celery real. El CI de este checkpoint debe comprobar también la nueva migración 0003.
+CI de la fase anterior (run 39707473699): backend y frontend exitosos, con PostgreSQL 17, Redis y el test que inicia un proceso Celery real. CI confirmado: run 39708069205 aprobó backend con la migración 0003, frontend y browser-smoke.
 
 ## Migración
 
@@ -24,7 +24,7 @@ CI de la fase anterior (run 39707473699): backend y frontend exitosos, con Postg
 
 ## Comprobación visual
 
-Se añade un smoke test Playwright para login, registro de colección, importación de imagen sintética, revisión, navegación y ancho móvil. Se ejecutará en GitHub Actions. El navegador no se pudo descargar en el entorno local; no se declara validación visual local.
+Se añade un smoke test Playwright para login, registro de colección, importación de imagen sintética, revisión, navegación y ancho móvil. Se ejecutó correctamente en GitHub Actions 39708069205. El navegador no se pudo descargar en el entorno local; la evidencia corresponde a CI. También pasan tres pruebas unitarias de avisos de UI tras corregir el borrado del mensaje de éxito.
 
 ## Próximo paso exacto
 
