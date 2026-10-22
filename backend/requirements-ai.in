@@ -1,0 +1,6 @@
+# Inputs for the AI worker. Install the verified worker-cpu.lock for CPU.
+# Uses the official headless distribution instead of installing two OpenCV packages.
+ultralytics-opencv-headless==8.4.183
+opencv-python-headless==5.0.0.93
+# torch==2.14.1+cpu / torchvision==0.29.1+cpu in worker-cpu.lock.
+# CUDA: choose the matching official torch/torchvision build for the actual GPU/driver.

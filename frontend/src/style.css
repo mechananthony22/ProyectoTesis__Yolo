@@ -1,0 +1,21 @@
+@import "tailwindcss";
+@theme { --color-forest: #153e2e; --color-lime: #d5ee96; --font-sans: 'Inter', 'Segoe UI', sans-serif; }
+:root {font-family:var(--font-sans);color:#23382c;background:#f5f7f3;font-synthesis:none;font-weight:400}
+body{margin:0}button,a,input,select,textarea{ -webkit-tap-highlight-color:transparent }button,a{touch-action:manipulation}button:not(:disabled){cursor:pointer}button:disabled{opacity:.55;cursor:wait}button:focus-visible,a:focus-visible{outline:3px solid #92bd61;outline-offset:3px}
+@layer components {
+ .card{@apply rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm;}
+ .btn{@apply inline-flex items-center justify-center gap-2 rounded-xl bg-forest px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#24563f] disabled:opacity-50;}
+ .btn-secondary{@apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50;}
+ .btn-danger{@apply rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100;}
+ .input{@apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100;}
+ .label{@apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500;}
+ .heading{@apply text-2xl font-semibold tracking-tight text-forest md:text-3xl;}
+ .subheading{@apply mt-2 max-w-3xl text-sm leading-relaxed text-slate-500;}
+ .badge{@apply inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600;}
+ .table-wrap{@apply overflow-x-auto rounded-xl border border-slate-200;}
+ .data-table{@apply w-full text-left text-sm;}
+ .data-table th{@apply whitespace-nowrap bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500;}
+ .data-table td{@apply border-t border-slate-100 px-4 py-3.5;}
+ .section-label{@apply text-[10px] font-semibold uppercase tracking-[.18em] text-slate-400;}
+}
+.fade-enter-active,.fade-leave-active{transition:opacity .15s}.fade-enter-from,.fade-leave-to{opacity:0}
