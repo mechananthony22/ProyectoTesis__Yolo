@@ -64,7 +64,7 @@ class VersionSerializer(serializers.ModelSerializer):
         exclude = ["archive"]
         read_only_fields = ["__all__"]
 
-    def get_count(self, obj):
+    def get_count(self, obj) -> int:
         return len(obj.manifest)
 
 
@@ -99,7 +99,7 @@ class InspectionSerializer(serializers.ModelSerializer):
         model = m.Inspection
         exclude = ["original", "annotated"]
 
-    def get_has_annotated(self, obj):
+    def get_has_annotated(self, obj) -> bool:
         return bool(obj.annotated)
 
 

@@ -15,7 +15,7 @@
 - 4 pruebas de autenticación aprobadas: login/refresh/logout, usuario inactivo, creación de usuario/contraseña y prevención de escalamiento de rol.
 - `npm run build`: TypeScript y Vite completados, 1687 módulos transformados.
 - `manage.py check --settings=config.test_settings`: sin errores.
-- Falta confirmar el pipeline CI con PostgreSQL y la prueba visual en navegador. No se declara validación PostgreSQL local: este entorno no tiene el servicio instalado.
+- GitHub Actions run 39619785356: backend y frontend completados con éxito. PostgreSQL 17: migraciones, check y suite aprobados. La prueba visual en navegador está en curso.
 
 ## Cómo probar
 

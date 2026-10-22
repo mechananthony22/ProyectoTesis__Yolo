@@ -12,22 +12,22 @@ Rama de trabajo: `feat/hasslab-implementacion`.
 5. No inventar precisión, recall, mAP, tiempos ni resultados de la tesis.
 6. El usuario ya tiene dataset; el sistema lo importa y administra. Vue 3 + TypeScript + Tailwind CSS. Backend Django REST Framework y PostgreSQL. Docker al final.
 
-## Checkpoint 02: base y autenticación verificadas en entorno aislado
+## Checkpoint 03–04: base verificada en PostgreSQL, dataset y anotaciones probados
 
 Se ha escrito un primer corte transversal del sistema. Está **en desarrollo**, no validado integralmente. Se conserva en Git para poder continuar sin perder trabajo. `main` conserva la planificación aprobada; la implementación se revisa en esta rama.
 
 | Fase | Estado | Código preparado |
 |---|---|---|
 | 01. Planificación | Documentada; actualizar decisiones de implementación | Documento original y este seguimiento |
-| 02. Base, diseño y acceso | Implementada, pendiente de pruebas de integración | Django settings, usuario/roles/JWT, migraciones, Vue/Router/Pinia/Tailwind, layout y login |
-| 03. Importación y dataset | Implementada, pendiente de pruebas | API importación ZIP/imágenes, galería, duplicados, procedencia y permisos |
-| 04. Anotaciones | Implementada, pendiente de pruebas | Editor SVG, cajas normalizadas, revisión humana, historial |
+| 02. Base, diseño y acceso | Backend y build verificados; prueba visual pendiente | Django settings, usuario/roles/JWT, migraciones, Vue/Router/Pinia/Tailwind, layout y login |
+| 03. Importación y dataset | API verificada | API importación ZIP/imágenes, galería, duplicados, procedencia y permisos |
+| 04. Anotaciones | API verificada; prueba visual pendiente | Editor SVG, cajas normalizadas, revisión humana, historial |
 | 05. Preprocesamiento | Implementada, pendiente de pruebas del worker | Letterbox, recorte/brillo/contraste, derivados y transformación de cajas |
 | 06. Versiones del dataset | Implementada, pendiente de pruebas | Split por grupo, snapshots, manifiestos y ZIP YOLO |
 | 07. Entrenamiento | Integración escrita; sin entrenamiento real | Celery, YOLOv8, epochs/métricas/modelos y exclusión de recursos AI |
 | 08. Detección e historial | Integración escrita; pendiente de pruebas | Carga/lotes/cámara, inferencia, revisión e historial |
 | 09. Dashboard/reportes | Implementada, pendiente de pruebas | Estadísticas reales, gráficos, exportación de inspecciones XLSX/PDF |
-| 10. Evaluación experimental | Implementación parcial | Protocolo, muestras test, observación manual, evaluación YOLO, resumen pareado; falta exportación de evidencia |
+| 10. Evaluación experimental | Implementación parcial | Protocolo, muestras test, observación manual, evaluación YOLO, resumen pareado y exportación de evidencia |
 | 11. Pruebas/documentación | En curso | `manage.py check` sin errores; faltan pruebas API/servicios, build final, manuales y CI |
 | 12. Docker/despliegue | No iniciada | Se hará después de validar el funcionamiento local |
 
@@ -48,12 +48,12 @@ Se ha escrito un primer corte transversal del sistema. Está **en desarrollo**, 
 - Generadas migraciones iniciales para usuario personalizado y dominio de investigación.
 - Dependencias frontend instaladas y `package-lock.json` generado.
 - Build frontend completado: TypeScript y Vite correctos (1687 módulos).
-- No se ha probado PostgreSQL, Redis, Celery ni YOLO real todavía.
+- PostgreSQL 17 verificado en GitHub Actions run 39619785356: migraciones y suite correctas. Falta integración real Redis/worker y YOLO.
 
 ## Próximo paso exacto
 
 1. Base frontend compilada; 4 pruebas de autenticación aprobadas. Consultar `docs/fases/02-base.md`.
-2. Añadir pruebas críticas del backend: permisos entre usuarios, ZIP seguro, anotaciones, revisiones, snapshots, división por fruto, tareas y exportaciones.
+2. Pruebas de auth/dataset aprobadas (16); 12 pruebas adicionales de procesamiento/reportes/evaluación también pasan. Revisar mejoras de trazabilidad y pruebas visuales.
 3. Exportación de evaluación implementada; falta comprobar su contenido y permisos.
 4. Validar entorno PostgreSQL y migraciones; SQLite se usa solo en pruebas aisladas.
 5. Revisar OpenAPI, errores HTTP, dependencias AI (OpenCV headless/Ultralytics) y pruebas visuales del frontend.
@@ -70,3 +70,10 @@ Se ha escrito un primer corte transversal del sistema. Está **en desarrollo**, 
 ### Registro de checkpoints
 - `ea31137`: código inicial de todos los módulos, pendiente de validación.
 - Checkpoint 02: pruebas de autenticación, build corregido, CI PostgreSQL preparado y registro de fase 02.
+
+- `1eb56fd`: base, CI y pruebas. GitHub Actions 39619785356 exitoso en PostgreSQL 17.
+- Fases 03 y 04 documentadas en `docs/fases/`. 28 pruebas locales aprobadas al retomar el chat (corregida reapertura del archivo en una prueba).
+
+## Retoma de sesión
+
+Se confirmó que la subida anterior se detuvo por límite de uso. Último commit publicado confirmado: `1eb56fd`. Los cierres 03–04 se publican en el próximo checkpoint; README local agregado. Próxima fase de código: 05 (trazabilidad y validación de derivados), luego 06 (versiones y exportación).

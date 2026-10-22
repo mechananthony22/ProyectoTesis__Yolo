@@ -86,7 +86,7 @@ def inspect_image(data, name):
                 width, height = img.size
                 gray = ImageOps.grayscale(img)
                 tiny = gray.resize((9, 8))
-                pix = list(tiny.getdata())
+                pix = list(tiny.get_flattened_data())
                 bits = "".join(
                     "1" if pix[y * 9 + x] > pix[y * 9 + x + 1] else "0"
                     for y in range(8)

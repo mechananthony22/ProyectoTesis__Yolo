@@ -17,6 +17,8 @@ from .validation import inspect_image, check_boxes
 
 
 def owned(queryset, user, field="owner"):
+    if not user.is_authenticated:
+        return queryset.none()
     return queryset if user.administrator else queryset.filter(**{field: user})
 
 
@@ -361,6 +363,8 @@ class ModelViewSet(ReadOnly):
 
     def get_queryset(self):
         qs = m.AIModel.objects.select_related("run")
+        if not self.request.user.is_authenticated:
+            return qs.none()
         return (
             qs
             if self.request.user.administrator
@@ -913,12 +917,17 @@ class ReportViewSet(viewsets.ViewSet):
 
 
 class AuditViewSet(ReadOnly):
-    class Serializer(serializers.ModelSerializer):
+    class AuditSerializer(serializers.ModelSerializer):
         class Meta:
             model = m.AuditEvent
             fields = "__all__"
 
-    serializer_class = Serializer
+    serializer_class = AuditSerializer
 
     def get_queryset(self):
         return owned(m.AuditEvent.objects.all(), self.request.user, "actor")
+
+# Attach explicit contracts once, before router registration.
+import sys
+from .schema import annotate_views
+annotate_views(sys.modules[__name__])
