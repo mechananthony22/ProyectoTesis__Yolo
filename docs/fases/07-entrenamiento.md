@@ -1,6 +1,6 @@
 # Fase 07 — Entrenamiento YOLOv8
 
-Fecha: 2026-10-22. Estado: implementación y entrenamiento técnico CPU local verificados; resultado de CI registrado en `../PROGRESO.md`.
+Fecha: 2026-10-22. Estado: implementación y entrenamiento técnico CPU verificados en local y en GitHub Actions 39813079042 (PostgreSQL + Redis + proceso Celery real).
 
 ## Implementación
 
@@ -47,7 +47,7 @@ La primera ejecución necesita descargar pesos oficiales y disponer de espacio s
 - Prueba real local: dos épocas de YOLOv8n preentrenado sobre figuras geométricas (4 train, 2 val, 2 test). Comprueba pesos recargables, hashes, archivos, progreso y métricas JSON válidas. **No contiene imágenes de paltas ni resultados de la tesis**.
 - Se detectó que Ultralytics vuelve a invocar el callback final al evaluar los mejores pesos. Se emparejan callbacks de inicio/fin para no registrar una época inexistente; prueba de regresión incluida.
 - Casos unitarios: concurrencia, errores, reintentos, permisos, rutas de archivos, dispositivos permitidos y métricas ausentes.
-- GitHub Actions incorpora `training-smoke`: instalación limpia, PostgreSQL 17, Redis y worker Celery real separado. Publica un informe técnico sin métricas científicas. Ver su resultado final en PROGRESO.
+- GitHub Actions incorpora `training-smoke`: instalación limpia, PostgreSQL 17, Redis y worker Celery real separado. Publica un informe técnico sin métricas científicas. CI 39813079042: entrenamiento real aprobado (1 prueba); backend PostgreSQL aprobado (54 pruebas y 1 omitida); frontend aprobado (6 pruebas y build). La prueba omitida del job backend se ejecuta por separado en training-smoke. Ver cierre en PROGRESO.
 
 Prueba local optativa, desde la raíz y con el entorno worker activo:
 

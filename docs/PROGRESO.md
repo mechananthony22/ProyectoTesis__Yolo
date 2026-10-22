@@ -20,7 +20,7 @@ Actualización: 2026-10-22 (America/Lima). Rama: `feat/hasslab-implementacion`. 
 | 04. Anotación | Editor SVG, validación de cajas, revisión e historial implementados; pruebas API aprobadas |
 | 05. Preprocesamiento | Originales intactos, recorte/letterbox/brillo/contraste, cajas y revisión de origen. Diez pruebas específicas aprobadas; worker real con Redis/PostgreSQL aprobado en CI de fase 05 |
 | 06. Versiones | Snapshots, grupos train/val/test, ZIP YOLO y hashes de integridad. Seis pruebas específicas aprobadas; CI 39708069205 aprobado |
-| 07. Entrenamiento | Implementado: lock CPU, entrenamiento YOLOv8 real, progreso, intentos, artefactos y modelos inactivos. Smoke local real aprobado; ver `docs/fases/07-entrenamiento.md` y cierre CI al final |
+| 07. Entrenamiento | Implementado: lock CPU, entrenamiento YOLOv8 real, progreso, intentos, artefactos y modelos inactivos. Smoke real aprobado en local y en CI 39813079042 con PostgreSQL/Redis/Celery; ver `docs/fases/07-entrenamiento.md` |
 | 08. Inferencia | Código/pantallas escritos y pruebas con motor simulado. **Pendiente** validar con modelo YOLOv8 realmente entrenado |
 | 09. Dashboard/reportes | Código/pantallas escritos; exportaciones XLSX/PDF de inspecciones verificadas por pruebas. Pendiente revisión funcional final |
 | 10. Evaluación | Protocolo, muestras, observación manual, comparación pareada y exportación escritos; pruebas API aprobadas. Sin experimento científico realizado |
@@ -82,3 +82,11 @@ Run 39707779885: backend y frontend correctos; el navegador detectó que el avis
 - Migración nueva: `0004_trainingrun_attempt_trainingrun_duration_seconds.py`.
 - CI amplía la prueba real a PostgreSQL + Redis + proceso Celery separado. Consultar el resultado del commit de fase 07 antes de declararlo aprobado.
 - El entorno local previo tenía binarios dañados; se creó `.venv-ai` limpio para las comprobaciones. No se incluye ningún entorno, imagen ni peso en Git.
+
+## Evidencia publicada fase 07
+
+- Commit de implementación: `1b0add8ea5342a1632018b9fa3f34935cf017945`.
+- GitHub Actions [39813079042](https://github.com/mechananthony22/ProyectoTesis__Yolo/actions/runs/39813079042): backend **54 passed, 1 skipped**, frontend **6 pruebas + build aprobados**, entrenamiento real CPU en proceso Celery separado **1 passed**. El caso omitido en backend es el entrenamiento, ejecutado por el job específico.
+- Informe técnico `ai-technical-smoke` disponible como artefacto temporal del run; no contiene resultados científicos. Los pesos de prueba permanecen fuera del repositorio.
+- Siguiente tarea autorizable: fase 08. Docker sigue reservado para fase 12.
+- Al registrar este cierre, `browser-smoke` seguía instalando Chromium; no se declara aprobado ese job del run 39813079042. Revisar su resultado remoto antes de la fase 08. La navegación del checkpoint anterior sí estaba aprobada.
